@@ -4,6 +4,7 @@ interface Movie {
   year: number
   rating: number
   poster: string
+  genre: string
 }
 
 interface MovieCardProps {
@@ -21,6 +22,7 @@ export function MovieCard({ movie }: MovieCardProps) {
         <div className="subtitle">
           {movie.year} ⭐ {movie.rating.toFixed(1)}
         </div>
+        <div className="subtitle">{movie.genre}</div>
       </div>
     </div>
   )

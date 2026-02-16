@@ -94,6 +94,30 @@ body {
   gap: 16px;
 }
 
+.filters {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.filter-group {
+  display: grid;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: left;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .subtitle { color: #6b7280; }
 
 .grid {
@@ -127,6 +151,11 @@ body {
   color: #fff;
 }
 
+.btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -150,4 +179,11 @@ body {
   padding: 10px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
+}
+
+.error-text {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: #b91c1c;
+  text-align: left;
 }

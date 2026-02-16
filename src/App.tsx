@@ -1,4 +1,5 @@
 import useSWR from "swr"
+import { useState } from "react"
 import { MovieCard } from "./movie-card"
 import { AddMovieForm } from "./add-movie-form"
 import { Film, Loader2 } from "lucide-react"
@@ -9,9 +10,11 @@ interface Movie {
   year: number
   rating: number
   poster: string
+  genre: string
 }
 
 const API_URL = "http://localhost:3000/movies"
+const GENRES_URL = "http://localhost:3000/movies/genres"
 
 const fetcher = async (url: string) => {
   const res = await fetch(url)
@@ -23,17 +26,38 @@ const fetcher = async (url: string) => {
   }))
 }
 
-export function MovieList() {
-  const { data: movies, error, isLoading, mutate } = useSWR<Movie[]>(API_URL, fetcher)
+const genresFetcher = async (url: string) => {
+  const res = await fetch(url)
+  const json = await res.json()
+  const data = Array.isArray(json) ? json : json?.data
+  if (!Array.isArray(data)) return []
+  return data.filter((item) => typeof item === "string")
+}
 
-  const handleAddMovie = async (movie: { title: string; year: number; rating: number; poster: string }) => {
+export function MovieList() {
+  const [selectedGenre, setSelectedGenre] = useState("")
+  const [minRating, setMinRating] = useState("any")
+
+  const queryParams = new URLSearchParams()
+  if (selectedGenre) queryParams.set("genre", selectedGenre)
+  if (minRating !== "any") queryParams.set("minRating", minRating)
+
+  const moviesUrl = queryParams.toString() ? `${API_URL}?${queryParams.toString()}` : API_URL
+
+  const { data: movies = [], error, isLoading, mutate } = useSWR<Movie[]>(moviesUrl, fetcher)
+  const { data: genres = [], isLoading: isGenresLoading } = useSWR<string[]>(GENRES_URL, genresFetcher)
+
+  const handleAddMovie = async (movie: { title: string; year: number; rating: number; poster: string; genre: string }) => {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(movie),
     })
 
-    if (!response.ok) throw new Error("Failed to add movie")
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(text || "Failed to add movie")
+    }
     mutate()
   }
 
@@ -58,19 +82,71 @@ export function MovieList() {
   }
 
  
-  return (
-  <div className="app">
-    <div className="header">
-      <AddMovieForm onAdd={handleAddMovie} />
-    </div>
+  const hasActiveFilters = selectedGenre !== "" || minRating !== "any"
 
-    <div className="grid">
-      {movies?.map((movie) => (
-        <MovieCard key={movie.id} movie={movie} />
-      ))}
+  return (
+    <div className="app">
+      <div className="header">
+        <AddMovieForm onAdd={handleAddMovie} />
+      </div>
+
+      <div className="filters">
+        <div className="filter-group">
+          <label className="filter-label" htmlFor="genre-filter">Genre</label>
+          <select
+            id="genre-filter"
+            className="input"
+            value={selectedGenre}
+            onChange={(e) => setSelectedGenre(e.target.value)}
+            disabled={isGenresLoading}
+          >
+            <option value="">{isGenresLoading ? "Loading..." : "All genres"}</option>
+            {genres.map((genre) => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label className="filter-label" htmlFor="rating-filter">Minimum rating</label>
+          <select
+            id="rating-filter"
+            className="input"
+            value={minRating}
+            onChange={(e) => setMinRating(e.target.value)}
+          >
+            <option value="any">Any rating</option>
+            <option value="7">7+</option>
+            <option value="8">8+</option>
+            <option value="9">9+</option>
+          </select>
+        </div>
+
+        {hasActiveFilters && (
+          <div className="filter-actions">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setSelectedGenre("")
+                setMinRating("any")
+              }}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="grid">
+        {movies.map((movie) => (
+          <MovieCard key={movie.id} movie={movie} />
+        ))}
+      </div>
     </div>
-  </div>
-)
+  )
 
 }
 
