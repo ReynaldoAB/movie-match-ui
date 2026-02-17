@@ -9,11 +9,12 @@ interface Movie {
 
 interface MovieCardProps {
   movie: Movie
+  onClick: () => void
 }
 
-export function MovieCard({ movie }: MovieCardProps) {
+export function MovieCard({ movie, onClick }: MovieCardProps) {
   return (
-    <div className="card">
+    <button type="button" className="card card-button" onClick={onClick}>
       <div>
         <img src={movie.poster} alt={movie.title} />
       </div>
@@ -24,6 +25,6 @@ export function MovieCard({ movie }: MovieCardProps) {
         </div>
         <div className="subtitle">{movie.genre}</div>
       </div>
-    </div>
+    </button>
   )
 }
