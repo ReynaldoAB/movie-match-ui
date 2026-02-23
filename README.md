@@ -1,28 +1,21 @@
 # Movie Match UI
 
-Frontend de la app **Movie Match** construido con **React + Vite**.
+Frontend de **Movie Match** construido con **React + Vite**.
 
-## Funcionalidades
-- Listado de películas desde API.
-- Formulario modal para agregar película.
-- Dropdown de género en el formulario (`GET /movies/genres`).
-- Dropdown de rating mínimo en el formulario (`Any rating`, `7+`, `8+`, `9+`).
-- Botón `Cancel` para cerrar el modal sin guardar.
-- Filtros sobre el grid:
-	- Género (desde `/movies/genres`).
-	- Rating mínimo (`Any rating`, `7+`, `8+`, `9+`).
-	- Botón `Clear filters` visible solo cuando hay filtros activos.
-- Filtros remotos: cuando cambian, la UI consulta con query params (ejemplo: `/movies?genre=ACTION&minRating=8`).
-- Click en tarjeta para abrir modal de detalle de película.
-- Sección de reviews dentro del modal:
-	- Lista reviews existentes con autor, estrellas (1-5) y comentario.
-	- Mensaje vacío: `No reviews yet. Be the first!`.
-	- Formulario para agregar review (`name`, `rating`, `comment`).
-	- Actualización inmediata de la lista tras enviar review (sin recargar la página).
+## Qué incluye
+- Vista de **Dashboard** con métricas del catálogo y reviews.
+- Vista de **Lista de películas** con grid de tarjetas.
+- Formulario modal para agregar películas.
+- Filtros remotos por género y rating mínimo.
+- Modal de detalle por película con:
+  - información básica,
+  - eliminación de película,
+  - listado de reviews,
+  - formulario para agregar review.
 
 ## Requisitos
 - Node.js 18+
-- API corriendo en `http://localhost:3000`
+- Backend corriendo en `http://localhost:3000`
 
 ## Instalación
 ```bash
@@ -34,32 +27,36 @@ npm install
 npm run dev
 ```
 
-La app queda en: `http://localhost:5173`
+La app abre en `http://localhost:5173`.
 
-## Configuración de la API
-La UI consume:
-- `GET http://localhost:3000/movies`
-- `GET http://localhost:3000/movies?genre=ACTION&minRating=8`
-- `GET http://localhost:3000/movies/genres`
-- `GET http://localhost:3000/movies/{id}` (incluye reviews)
-- `POST http://localhost:3000/movies`
-- `POST http://localhost:3000/movies/{id}/reviews`
+## Cómo se conecta al backend
+En frontend, las llamadas usan rutas con prefijo `'/api'`.
 
-Si cambias el puerto de la API, actualiza `API_URL` en `src/App.tsx`.
+Ejemplo:
+- `GET /api/movies`
+- `GET /api/movies/genres`
+- `GET /api/stats`
 
-## Estructura
-- `src/App.tsx`: lista, filtros y carga remota desde la API
-- `src/add-movie-form.tsx`: formulario modal para agregar
-- `src/movie-card.tsx`: tarjeta de película
-- `src/App.tsx`: también incluye modal de detalle y reseñas
-- `src/index.css`: estilos base
+Vite redirige ese prefijo al backend (`http://localhost:3000`) mediante `server.proxy` en `vite.config.js`.
 
-## Notas de datos
-- El backend valida `genre` como enum (ejemplo: `ACTION`, `COMEDY`, etc.).
-- El formulario muestra errores de guardado cuando la API responde con error.
-- Para guardar película, selecciona rating `7+`, `8+` o `9+` (no `Any rating`).
+## Endpoints usados por la UI
+- `GET /movies`
+- `GET /movies?genre=ACTION&minRating=8`
+- `GET /movies/genres`
+- `GET /movies/:id`
+- `POST /movies`
+- `DELETE /movies/:id`
+- `POST /movies/:id/reviews`
+- `GET /stats`
 
-## Scripts
-- `npm run dev` — servidor de desarrollo
-- `npm run build` — build de producción
-- `npm run preview` — previsualizar build
+## Estructura principal
+- `src/App.tsx`: navegación entre dashboard/lista, filtros, detalle y reviews.
+- `src/components/Dashboard.jsx`: métricas y actividad reciente.
+- `src/add-movie-form.tsx`: modal para crear películas.
+- `src/movie-card.tsx`: tarjeta de película.
+
+## Scripts disponibles
+- `npm run dev`: servidor de desarrollo.
+- `npm run build`: build de producción.
+- `npm run preview`: previsualización del build.
+- `npm run lint`: lint con ESLint.

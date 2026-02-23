@@ -29,7 +29,7 @@ export function AddMovieForm({ onAdd }: AddMovieFormProps) {
       setIsGenresLoading(true)
 
       try {
-        const res = await fetch("http://localhost:3000/movies/genres")
+        const res = await fetch("/api/movies/genres")
         const json = await res.json()
         const data = Array.isArray(json) ? json : json?.data
         if (Array.isArray(data)) {

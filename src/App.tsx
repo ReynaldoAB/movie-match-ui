@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { MovieCard } from "./movie-card"
 import { AddMovieForm } from "./add-movie-form"
 import { Film, Loader2 } from "lucide-react"
+import Dashboard from "./components/Dashboard"
 
 interface Movie {
   id: number
@@ -28,7 +29,7 @@ const toSafeNumber = (value: unknown, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
-const API_BASE_URL = "http://localhost:3000"
+const API_BASE_URL = "/api"
 const API_URL = `${API_BASE_URL}/movies`
 const GENRES_URL = `${API_BASE_URL}/movies/genres`
 
@@ -474,4 +475,31 @@ export function MovieList() {
 
 }
 
-export default MovieList
+function App() {
+  const [activeView, setActiveView] = useState<"dashboard" | "movies">("dashboard")
+
+  return (
+    <>
+      <nav className="view-tabs" aria-label="Main navigation">
+        <button
+          type="button"
+          className={`btn ${activeView === "dashboard" ? "btn-primary" : "btn-secondary"}`}
+          onClick={() => setActiveView("dashboard")}
+        >
+          Dashboard
+        </button>
+        <button
+          type="button"
+          className={`btn ${activeView === "movies" ? "btn-primary" : "btn-secondary"}`}
+          onClick={() => setActiveView("movies")}
+        >
+          Lista de películas
+        </button>
+      </nav>
+
+      {activeView === "dashboard" ? <Dashboard /> : <MovieList />}
+    </>
+  )
+}
+
+export default App
